@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyBtn = document.getElementById('copyBtn');
   const webBuddyBtn = document.getElementById('webBuddyBtn');
   const statusEl = document.getElementById('status');
-  const characterSelect = document.getElementById('characterSelect');
 
   if (toggle && statusEl) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -128,24 +127,60 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // "Web Buddy" persona selection logic
-  if (characterSelect) {
+  const characterSelectWrapper = document.getElementById('characterSelectWrapper');
+  const characterSelectTrigger = document.getElementById('characterSelectTrigger');
+  const characterSelectText = document.getElementById('characterSelectText');
+  const characterOptions = document.getElementById('characterOptions');
+
+  if (characterSelectWrapper && characterSelectTrigger && characterSelectText && characterOptions) {
     // Add characters from the data file
     characters.forEach(char => {
-      const option = document.createElement('option');
-      option.value = char.id;
-      option.textContent = char.title;
-      characterSelect.appendChild(option);
+      const optionEl = document.createElement('div');
+      optionEl.classList.add('custom-option');
+      optionEl.textContent = char.title;
+      optionEl.dataset.value = char.id;
+      characterOptions.appendChild(optionEl);
+
+      optionEl.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent document click listener from firing
+        const selectedValue = optionEl.dataset.value;
+        
+        // Update UI
+        characterSelectText.textContent = optionEl.textContent;
+        
+        // Update selected classes
+        characterOptions.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        optionEl.classList.add('selected');
+
+        // Save to storage
+        chrome.storage.local.set({ 'web-buddy-selected-character-id': selectedValue });
+
+        // Close dropdown
+        characterSelectWrapper.classList.remove('open');
+      });
     });
 
     // Load saved character and set dropdown
     chrome.storage.local.get(['web-buddy-selected-character-id'], (result) => {
       const savedCharId = result['web-buddy-selected-character-id'] || characters[0].id;
-      characterSelect.value = savedCharId;
+      const selectedChar = characters.find(c => c.id === savedCharId) || characters[0];
+      
+      characterSelectText.textContent = selectedChar.title;
+      
+      const selectedOption = characterOptions.querySelector(`.custom-option[data-value="${savedCharId}"]`);
+      if (selectedOption) {
+        selectedOption.classList.add('selected');
+      }
     });
 
-    // Save character on change
-    characterSelect.addEventListener('change', () => {
-      chrome.storage.local.set({ 'web-buddy-selected-character-id': characterSelect.value });
+    characterSelectTrigger.addEventListener('click', () => {
+      characterSelectWrapper.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!characterSelectWrapper.contains(e.target)) {
+        characterSelectWrapper.classList.remove('open');
+      }
     });
   }
 }); 
