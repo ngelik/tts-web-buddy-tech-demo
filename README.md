@@ -7,6 +7,8 @@ A voice-first AI Chrome extension that provides dictation, page copying, and con
 - **Voice Dictation**: Click any text field and speak to type
 - **Page Copy**: Convert any webpage to clean Markdown format
 - **Web Buddy Chat**: Have a conversation with AI about the current page content
+- **Character Personalities**: Multiple AI personalities with different voices and communication styles
+- **Smart Greetings**: Random personalized greetings when starting Web Buddy to provide audio feedback
 - **Site Toggle**: Enable/disable the extension per website
 - **API Integration**: Uses ElevenLabs for speech-to-text/text-to-speech and OpenRouter for LLM
 
@@ -125,7 +127,7 @@ sequenceDiagram
     CS->>SW: sendMessage({type: 'start-recording'})
     deactivate CS
     activate SW
-    SW->>OFF: setupOffscreenDocument()
+    SW->>SW: setupOffscreenDocument()
     SW->>OFF: sendMessage({type: 'start-recording'})
     activate OFF
     OFF->>User: Requests Mic Permission (if needed)
@@ -188,8 +190,8 @@ sequenceDiagram
     POP->>SW: sendMessage({type: 'START_ANALYSIS'})
     deactivate POP
     activate SW
-    SW->>STO: Reads selected character ID
-    STO-->>SW: Returns character ID
+    SW->>STO: Reads selected character ID & API keys
+    STO-->>SW: Returns character ID & API keys
     SW->>SW: Loads character personality data
     SW->>POP: Updates UI to "Reading Page..."
     SW->>CS: getPageMarkdownForAnalysis()
@@ -198,6 +200,16 @@ sequenceDiagram
     CS-->>SW: Returns Markdown context
     deactivate CS
     SW->>SW: Stores page context & character
+    SW->>SW: Generates random greeting
+    SW->>POP: Updates UI to "Speaking..."
+    SW->>TTS: fetch(greeting, character voiceId)
+    activate TTS
+    TTS-->>SW: Returns greeting audio
+    deactivate TTS
+    SW->>OFF: sendMessage({type: 'PLAY_AUDIO'})
+    activate OFF
+    OFF->>User: Plays greeting (3 seconds)
+    deactivate OFF
     SW->>POP: Updates UI to "Recording..."
     SW->>OFF: sendMessage({type: 'start-recording'})
     activate OFF

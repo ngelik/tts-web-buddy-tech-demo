@@ -1,5 +1,34 @@
 import { characters } from './src/characters.js';
 
+// Random greetings for Web Buddy
+const webBuddyGreetings = [
+  "Hello! Ready to help.",
+  "Hi there! I'm listening.",
+  "Greetings! How can I assist?",
+  "Hello! What would you like to know?",
+  "Hi! Ready to chat.",
+  "Greetings! I'm here to help.",
+  "Hello! What's on your mind?",
+  "Hi! How can I clarify?",
+  "Hey! I'm all ears.",
+  "Good to see you! Ready when you are.",
+  "Hello! Let's explore together.",
+  "Hi! What shall we discover?",
+  "Greetings! I'm your guide.",
+  "Hello! Ready to assist.",
+  "Hi there! What interests you?",
+  "Hey! Let's dive in.",
+  "Hello! I'm here for you.",
+  "Hi! What can I explain?",
+  "Greetings! Ready to help.",
+  "Hello! What's your question?",
+  "Hi! I'm listening carefully.",
+  "Hey! Let's get started.",
+  "Hello! How may I help?",
+  "Hi there! Ready to explore.",
+  "Greetings! What would you like to learn?"
+];
+
 // Simplified state for the new workflow
 let recordingState = {
   isRecording: false,
@@ -17,6 +46,12 @@ let analysisState = {
   isPlayingAudio: false,
   character: null,
 };
+
+// --- Helper Functions ---
+function getRandomGreeting() {
+  const randomIndex = Math.floor(Math.random() * webBuddyGreetings.length);
+  return webBuddyGreetings[randomIndex];
+}
 
 // --- Offscreen Document Management ---
 const OFFSCREEN_DOCUMENT_PATH = 'offscreen.html';
@@ -269,17 +304,58 @@ async function handleStartAnalysis(sendResponse) {
     const md = await getPageMarkdownForAnalysis(tab);
     analysisState.pageContext = md;
     
-    // Automatically start recording instead of going to 'listening' phase
-    analysisState.phase = 'recording';
+    // Get API keys for greeting
+    const { 'elevenlabs-api-key': elevenApi, 'openrouter-api-key': orApi, 'openrouter-model': orModel } = await chrome.storage.local.get(['elevenlabs-api-key', 'openrouter-api-key', 'openrouter-model']);
     
-    // Send state update to popup
+    if (!elevenApi) {
+      console.error('ElevenLabs API key not found');
+      resetAnalysisState();
+      chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
+      return;
+    }
+
+    // Play a greeting first
+    const greeting = getRandomGreeting();
+    const voiceId = analysisState.character?.voiceId || '1SM7GgM6IMuvQlz2BwM3'; // Default voice
+    
+    // Set phase to speaking for the greeting
+    analysisState.phase = 'speaking';
     chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
     
-    // Start recording immediately
-    setupOffscreenDocument().then(() => {
+    // Setup offscreen and play greeting
+    await setupOffscreenDocument();
+    
+    try {
+      // Generate and play the greeting
+      const greetingAudio = await generateAudioForSentence(greeting, elevenApi, voiceId);
+      if (greetingAudio) {
+        sendToOffscreen({ type: 'PLAY_AUDIO', dataUrl: greetingAudio });
+        
+        // Wait for greeting to finish, then start recording
+        setTimeout(() => {
+          analysisState.phase = 'recording';
+          chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
+          
+          sendToOffscreen({ type: 'PLAY_BEEP', isStart: true });
+          sendToOffscreen({ type: 'start-recording' });
+        }, 1500); // Wait 1.5 seconds for shorter greeting to finish
+      } else {
+        // If greeting fails, start recording immediately
+        analysisState.phase = 'recording';
+        chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
+        
+        sendToOffscreen({ type: 'PLAY_BEEP', isStart: true });
+        sendToOffscreen({ type: 'start-recording' });
+      }
+    } catch (error) {
+      console.error('Greeting generation failed:', error);
+      // If greeting fails, start recording immediately
+      analysisState.phase = 'recording';
+      chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
+      
       sendToOffscreen({ type: 'PLAY_BEEP', isStart: true });
       sendToOffscreen({ type: 'start-recording' });
-    });
+    }
 
   } catch (error) {
     console.error("Analysis startup failed:", error);
