@@ -443,8 +443,10 @@ async function streamLlmToTts(question, orApi, orModel, elevenApi, voiceId) {
       model: orModel,
       stream: true,
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Webpage Content:\n\n---\n\n${analysisState.pageContext}\n\nMy question: ${question}` }
+        { 
+          role: 'user', 
+          content: `${systemPrompt}\n\nWebpage Content:\n\n---\n\n${analysisState.pageContext}\n\nMy question: ${question}` 
+        }
       ]
     }),
     signal: analysisState.abortController.signal,
