@@ -251,7 +251,7 @@ async function handleStartAnalysis(sendResponse) {
   if (!tab) return;
 
   const { 'web-buddy-selected-character-id': selectedCharId } = await chrome.storage.local.get('web-buddy-selected-character-id');
-  const selectedCharacter = characters.find(c => c.id === selectedCharId);
+  const selectedCharacter = characters.find(c => c.id === selectedCharId) || characters[0];
 
   const abortController = new AbortController();
   analysisState = { 
@@ -261,7 +261,7 @@ async function handleStartAnalysis(sendResponse) {
     abortController: abortController,
     audioQueue: [],
     isPlayingAudio: false,
-    character: selectedCharacter || null
+    character: selectedCharacter
   };
 
   sendResponse(analysisState); // Update popup UI to "Fetching..."
@@ -319,7 +319,7 @@ function resetAnalysisState() {
     abortController: null,
     audioQueue: [],
     isPlayingAudio: false,
-    character: null,
+    character: characters[0],
   };
   closeOffscreenDocument();
 }

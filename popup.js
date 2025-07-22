@@ -129,12 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // "Web Buddy" persona selection logic
   if (characterSelect) {
-    // Add default option
-    const defaultOption = document.createElement('option');
-    defaultOption.value = 'default';
-    defaultOption.textContent = 'Default';
-    characterSelect.appendChild(defaultOption);
-
     // Add characters from the data file
     characters.forEach(char => {
       const option = document.createElement('option');
@@ -145,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load saved character and set dropdown
     chrome.storage.local.get(['web-buddy-selected-character-id'], (result) => {
-      const savedCharId = result['web-buddy-selected-character-id'] || 'default';
+      const savedCharId = result['web-buddy-selected-character-id'] || characters[0].id;
       characterSelect.value = savedCharId;
     });
 
