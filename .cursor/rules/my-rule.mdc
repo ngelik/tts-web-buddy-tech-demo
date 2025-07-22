@@ -4,6 +4,8 @@ globs:
 alwaysApply: true
 ---
 
-Don't commit changes automatically!
+Never commit any git changes automatically!
 
-Run ./build.sh script as sson as you done with tasks. This is a  finall build step
+Run ./build.sh script as sson as you done with tasks. This is a  finall build step.
+
+Never commit any git changes automatically!
