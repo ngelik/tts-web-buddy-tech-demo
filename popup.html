@@ -134,56 +134,6 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
-    
-    /* Modern Dropdown Styles */
-    .dropdown-container {
-      position: relative;
-      display: inline-block;
-    }
-    
-    .dropdown-select {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-      transition: all 0.15s ease;
-      width: 120px;
-      text-align: left;
-      -webkit-appearance: none;
-      appearance: none;
-      position: relative;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 16px;
-      padding-right: 32px;
-    }
-    
-    .dropdown-select:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-    }
-    
-    .dropdown-select:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-    
-    .dropdown-select option {
-      background: white;
-      color: #2d3748;
-      padding: 8px 12px;
-      font-size: 13px;
-    }
-    
-    .dropdown-select option:hover {
-      background: #f7fafc;
-    }
   </style>
 </head>
 <body>
@@ -219,11 +169,9 @@
     <div class="setting-row">
       <span class="setting-label">Personality</span>
       <div class="setting-control">
-        <div class="dropdown-container">
-          <select id="characterSelect" class="dropdown-select">
-            <!-- Options will be populated by popup.js -->
-          </select>
-        </div>
+        <select id="characterSelect" class="primary-btn" style="width: 120px; height: 33px; padding: 0 8px; -webkit-appearance: none; appearance: none; text-indent: 1px; text-overflow: '';">
+          <!-- Options will be populated by popup.js -->
+        </select>
       </div>
     </div>
 
