@@ -1,5 +1,3 @@
-import { characters } from './src/characters.js';
-
 document.addEventListener('DOMContentLoaded', () => {
   // Site toggle logic
   const toggle = document.getElementById('siteToggle');
@@ -126,61 +124,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // "Web Buddy" persona selection logic
-  const characterSelectWrapper = document.getElementById('characterSelectWrapper');
-  const characterSelectTrigger = document.getElementById('characterSelectTrigger');
-  const characterSelectText = document.getElementById('characterSelectText');
-  const characterOptions = document.getElementById('characterOptions');
 
-  if (characterSelectWrapper && characterSelectTrigger && characterSelectText && characterOptions) {
-    // Add characters from the data file
-    characters.forEach(char => {
-      const optionEl = document.createElement('div');
-      optionEl.classList.add('custom-option');
-      optionEl.textContent = char.title;
-      optionEl.dataset.value = char.id;
-      characterOptions.appendChild(optionEl);
-
-      optionEl.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent document click listener from firing
-        const selectedValue = optionEl.dataset.value;
-        
-        // Update UI
-        characterSelectText.textContent = optionEl.textContent;
-        
-        // Update selected classes
-        characterOptions.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-        optionEl.classList.add('selected');
-
-        // Save to storage
-        chrome.storage.local.set({ 'web-buddy-selected-character-id': selectedValue });
-
-        // Close dropdown
-        characterSelectWrapper.classList.remove('open');
-      });
-    });
-
-    // Load saved character and set dropdown
-    chrome.storage.local.get(['web-buddy-selected-character-id'], (result) => {
-      const savedCharId = result['web-buddy-selected-character-id'] || characters[0].id;
-      const selectedChar = characters.find(c => c.id === savedCharId) || characters[0];
-      
-      characterSelectText.textContent = selectedChar.title;
-      
-      const selectedOption = characterOptions.querySelector(`.custom-option[data-value="${savedCharId}"]`);
-      if (selectedOption) {
-        selectedOption.classList.add('selected');
-      }
-    });
-
-    characterSelectTrigger.addEventListener('click', () => {
-      characterSelectWrapper.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!characterSelectWrapper.contains(e.target)) {
-        characterSelectWrapper.classList.remove('open');
-      }
-    });
-  }
 }); 
