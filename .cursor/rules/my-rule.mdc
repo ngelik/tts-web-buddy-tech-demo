@@ -1,0 +1,9 @@
+---
+description: Custom rules
+globs:
+alwaysApply: true
+---
+
+Don't commit changes automatically!
+
+Run ./build.sh script as sson as you done with tasks. This is a  finall build step

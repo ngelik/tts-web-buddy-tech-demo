@@ -167,7 +167,7 @@ sequenceDiagram
 ### 2. Web Buddy Chat Flow
 
 The most complex workflow involving page analysis, voice interaction, and AI conversation.
-A user can select a character persona from the popup, which is saved to storage. When the chat is initiated, the service worker reads this preference to alter the AI's personality and voice.
+A user can select a character personality from the popup, which is saved to storage. When the chat is initiated, the service worker reads this preference to alter the AI's personality and voice.
 
 ```mermaid
 sequenceDiagram
@@ -180,7 +180,7 @@ sequenceDiagram
     participant LLM as OpenRouter API
     participant TTS as ElevenLabs TTS API
 
-    User->>POP: Selects Character Persona
+    User->>POP: Selects Character Personality
     POP->>STO: Saves selected character ID
 
     User->>POP: Clicks "Web Buddy" button
@@ -190,7 +190,7 @@ sequenceDiagram
     activate SW
     SW->>STO: Reads selected character ID
     STO-->>SW: Returns character ID
-    SW->>SW: Loads character persona data
+    SW->>SW: Loads character personality data
     SW->>POP: Updates UI to "Reading Page..."
     SW->>CS: getPageMarkdownForAnalysis()
     activate CS
@@ -324,7 +324,7 @@ tts-web-buddy-tech-demo/
 ├── options.js            # Settings management
 ├── onboarding.js         # Setup flow
 ├── src/
-│   ├── characters.js       # Web Buddy persona definitions
+│   ├── characters.js       # Web Buddy personality definitions
 │   └── libs-bundle.js    # Bundled dependencies
 ├── webpack.config.js     # Build configuration
 └── icons/                # Extension icons
