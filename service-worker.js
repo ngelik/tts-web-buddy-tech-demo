@@ -318,18 +318,32 @@ async function handleStartAnalysis(sendResponse) {
     const greeting = getRandomGreeting();
     const voiceId = analysisState.character?.voiceId || '1SM7GgM6IMuvQlz2BwM3'; // Default voice
     
+    console.log('Playing greeting:', greeting, 'with voice ID:', voiceId);
+    
     // Set phase to speaking for the greeting
     analysisState.phase = 'speaking';
     chrome.runtime.sendMessage({ type: 'ANALYSIS_STATE_UPDATE', state: analysisState });
     
     // Setup offscreen and play greeting
     await setupOffscreenDocument();
+    console.log('Offscreen document setup complete');
     
     try {
       // Generate and play the greeting
+      console.log('Generating audio for greeting...');
       const greetingAudio = await generateAudioForSentence(greeting, elevenApi, voiceId);
+      console.log('Audio generated, blob size:', greetingAudio?.size);
+      
       if (greetingAudio) {
-        sendToOffscreen({ type: 'PLAY_AUDIO', dataUrl: greetingAudio });
+        // Convert blob to data URL
+        const audioDataUrl = await new Promise(resolve => {
+          const fr = new FileReader();
+          fr.onload = () => resolve(fr.result);
+          fr.readAsDataURL(greetingAudio);
+        });
+        
+        console.log('Sending audio to offscreen document...');
+        sendToOffscreen({ type: 'PLAY_AUDIO', dataUrl: audioDataUrl });
         
         // Wait for greeting to finish, then start recording
         setTimeout(() => {
