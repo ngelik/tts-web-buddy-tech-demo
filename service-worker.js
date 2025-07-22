@@ -305,7 +305,7 @@ async function handleStartAnalysis(sendResponse) {
     analysisState.pageContext = md;
     
     // Get API keys for greeting
-    const { 'elevenlabs-api-key': elevenApi, 'openrouter-api-key': orApi, 'openrouter-model': orModel } = await chrome.storage.local.get(['elevenlabs-api-key', 'openrouter-api-key', 'openrouter-model']);
+    const { 'ttsbuddy-api-key': elevenApi, 'openrouter-api-key': orApi, 'openrouter-model': orModel } = await chrome.storage.local.get(['ttsbuddy-api-key', 'openrouter-api-key', 'openrouter-model']);
     
     if (!elevenApi) {
       console.error('ElevenLabs API key not found');
