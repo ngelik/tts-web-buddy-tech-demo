@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Buddy Options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #7b5dfd 0%, #9c70ff 100%);
+      --bg-gradient: linear-gradient(135deg, #f9faff 0%, #eaf0ff 100%);
+      --text-dark: #333;
+      --text-muted: #666;
+    }
+    body { 
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      padding: 40px; 
+      max-width: 600px; 
+      margin: 0 auto;
+      background: var(--bg-gradient); /* soft pastel gradient */
+      min-height: 100vh;
+    }
+    .container {
+      background: #ffffffcc; /* translucent white */
+      backdrop-filter: blur(10px);
+      padding: 40px 32px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      animation: fadeInUp 0.6s ease both;
+    }
+    @keyframes fadeInUp { from { opacity:0; transform: translateY(20px);} to { opacity:1; transform:translateY(0);} }
+    .header {
+      display: flex;
+      flex-direction: column; /* stack logo and title vertically */
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      background: url('icons/icon48.png') center/contain no-repeat;
+    }
+    h1 { 
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: var(--text-dark);
+      margin: 0; 
+      font-size: 32px; 
+      font-weight: 600; 
+    }
+    p { 
+      color: var(--text-muted);
+      margin-bottom: 20px; 
+      line-height: 1.5; 
+    }
+    .form-group { 
+      margin-bottom: 20px; 
+    }
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 500; 
+      color: #555; 
+    }
+    input { 
+      width: 100%; 
+      padding: 12px; 
+      border: 2px solid #ddd; 
+      border-radius: 6px; 
+      font-size: 16px; 
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+    input:focus {
+      outline: none;
+      border-color: #884CB8;
+    }
+    button { 
+      background: var(--primary-gradient);
+      color: white; 
+      border: none; 
+      padding: 14px 28px; 
+      border-radius: 30px; 
+      font-size: 16px; 
+      cursor: pointer; 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+    button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.3);
+      transform: skewX(-20deg);
+    }
+    button:hover::after {
+      animation: shine 0.8s forwards;
+    }
+    @keyframes shine { to { left: 200%; } }
+
+    /* Dark-mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-gradient: linear-gradient(135deg,#1d1f24 0%,#2b2e35 100%);
+        --text-dark: #f5f5f7;
+        --text-muted: #aaa;
+      }
+      .container {
+        background: #2f323aee;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      }
+    }
+    #status { 
+      margin-top: 15px; 
+      font-weight: 500; 
+    }
+    .success { 
+      color: #28a745; 
+    }
+    .error { 
+      color: #dc3545; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo"></div>
+      <h1>Web Buddy Options</h1>
+    </div>
+    <p>Enter your ElevenLabs API key to enable voice-to-text conversion.</p>
+    <div class="form-group">
+      <label for="apiKey">ElevenLabs API Key:</label>
+      <input type="password" id="apiKey" name="apiKey" placeholder="Enter your ElevenLabs API key...">
+    </div>
+    <div class="form-group">
+      <label for="openrouterApiKey">OpenRouter API Key:</label>
+      <input type="password" id="openrouterApiKey" name="openrouterApiKey" placeholder="Enter your OpenRouter API key...">
+    </div>
+    <div class="form-group">
+      <label for="openrouterModel">OpenRouter Model:</label>
+      <input type="text" id="openrouterModel" name="openrouterModel" placeholder="e.g., google/gemma-3n-e4b-it:free">
+    </div>
+    <div class="form-group">
+      <label for="elevenlabsVoiceId">ElevenLabs Voice ID:</label>
+      <input type="text" id="elevenlabsVoiceId" name="elevenlabsVoiceId" placeholder="e.g., 1SM7GgM6IMuvQlz2BwM3">
+    </div>
+    <button id="save">Save Settings</button>
+    <p id="status"></p>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html> 
