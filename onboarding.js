@@ -118,7 +118,6 @@ async function loadExistingApiKey() {
         const result = await chrome.storage.local.get('ttsbuddy-api-key');
         if (result['ttsbuddy-api-key']) {
             document.getElementById('apiKeyInput').value = result['ttsbuddy-api-key'];
-            console.log('Loaded existing API key');
         }
     } catch (error) {
         console.error('Error loading API key:', error);
@@ -135,7 +134,6 @@ async function saveApiKey() {
     
     try {
         await chrome.storage.local.set({ 'ttsbuddy-api-key': apiKey });
-        console.log('API key saved successfully');
         nextStep();
     } catch (error) {
         console.error('Error saving API key:', error);
@@ -151,7 +149,6 @@ async function requestMicrophonePermission() {
     button.disabled = true;
     
     try {
-        console.log('Requesting microphone permission...');
         
         // Request microphone permission from the extension context
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -165,7 +162,6 @@ async function requestMicrophonePermission() {
         // Stop the stream immediately - we just wanted to get permission
         stream.getTracks().forEach(track => track.stop());
         
-        console.log('Microphone permission granted!');
         microphoneGranted = true;
         
         button.textContent = '✅ Microphone Access Granted';

@@ -64,9 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    console.log('Initializing character dropdown with:', characters.length, 'characters');
-    console.log('Available characters:', characters.map(c => c.title));
-
     // Add characters from the data file
     characters.forEach(char => {
       const optionEl = document.createElement('div');
@@ -78,9 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
       optionEl.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent document click listener from firing
         const selectedValue = optionEl.dataset.value;
-        
+                
         // Update UI
-        characterSelectText.textContent = optionEl.textContent;
+        if (characterSelectText) {
+          characterSelectText.textContent = optionEl.textContent;
+          characterSelectText.style.color = '#2d3748'; // Ensure text is visible
+          characterSelectText.style.display = 'block'; // Ensure element is visible
+        } else {
+          console.error('characterSelectText is null in click handler!');
+        }
         
         // Update selected classes
         characterOptions.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
@@ -96,8 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set initial selection
     const selectedChar = characters.find(c => c.id === savedCharId) || characters[0];
-    characterSelectText.textContent = selectedChar.title;
-    console.log('Selected character:', selectedChar.title);
+    
+    if (characterSelectText) {
+      characterSelectText.textContent = selectedChar.title;
+      characterSelectText.style.color = '#2d3748'; // Ensure text is visible
+      characterSelectText.style.display = 'block'; // Ensure element is visible
+    } else {
+      console.error('characterSelectText element is null!');
+    }
     
     const selectedOption = characterOptions.querySelector(`.custom-option[data-value="${savedCharId}"]`);
     if (selectedOption) {

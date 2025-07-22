@@ -27,15 +27,10 @@ function playBeep(isStart) {
 chrome.runtime.onMessage.addListener(async (message) => {
   if (message.type === 'start-recording') {
     if (recorder?.state === 'recording') {
-      console.log('Already recording.');
       return;
     }
 
-    console.log('VTT: Requesting microphone access...');
-
-    try {
-      console.log('VTT: Calling getUserMedia to trigger native permission dialog...');
-      // This should trigger Chrome's native permission dialog
+    try {      // This should trigger Chrome's native permission dialog
       stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -43,9 +38,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
           autoGainControl: true
         }
       });
-      console.log('VTT: getUserMedia successful!');
     } catch (error) {
-      console.error('VTT: getUserMedia error:', error.name, error.message);
       
       if (error.name === 'NotAllowedError') {
         // User explicitly denied or dismissed the permission dialog

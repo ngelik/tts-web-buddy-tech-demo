@@ -179,7 +179,6 @@ async function handlePermissionDenied() {
 
 async function handleStopRecording() {
   if (!recordingState.isRecording) {
-    console.log("Not recording. Ignoring stop request.");
     return;
   }
   recordingState.isRecording = false; // Stop recording immediately from a state perspective.
@@ -547,7 +546,6 @@ async function copyPageAsMarkdown(tab) {
     // If content script isn't loaded, inject it first
     if (err.message?.includes('Receiving end does not exist')) {
       try {
-        console.log('Content script not ready for clipboard copy, injecting and retrying...');
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           files: ['content-script.js'],
@@ -642,7 +640,6 @@ async function getPageMarkdown(tab) {
             } catch (err) {
                 // This error typically means the content script isn't loaded yet.
                 if (err.message?.includes('Receiving end does not exist')) {
-                    console.log('Content script not ready, injecting and retrying...');
                     try {
                         await chrome.scripting.executeScript({
                             target: { tabId: tab.id },
@@ -779,7 +776,6 @@ async function getPageMarkdownForAnalysis(tab) {
             } catch (err) {
                 // This error typically means the content script isn't loaded yet.
                 if (err.message?.includes('Receiving end does not exist')) {
-                    console.log('Content script not ready, injecting and retrying...');
                     try {
                         await chrome.scripting.executeScript({
                             target: { tabId: tab.id },
