@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (result['elevenlabs-voice-id']) {
       elevenlabsVoiceIdInput.value = result['elevenlabs-voice-id'];
     } else {
-      elevenlabsVoiceIdInput.value = '1SM7GgM6IMuvQlz2BwM3'; // Default voice
+      elevenlabsVoiceIdInput.value = 'QkNxCtnKGOHCAoQubo3r'; // Default voice
     }
   });
 

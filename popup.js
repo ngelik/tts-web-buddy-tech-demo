@@ -1,9 +1,12 @@
+import { characters } from './src/characters.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   // Site toggle logic
   const toggle = document.getElementById('siteToggle');
   const copyBtn = document.getElementById('copyBtn');
   const webBuddyBtn = document.getElementById('webBuddyBtn');
   const statusEl = document.getElementById('status');
+  const characterSelect = document.getElementById('characterSelect');
 
   if (toggle && statusEl) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -121,6 +124,34 @@ document.addEventListener('DOMContentLoaded', () => {
           chrome.runtime.sendMessage({ type: messageType }, updateWebBuddyButton);
         }
       });
+    });
+  }
+
+  // "Web Buddy" persona selection logic
+  if (characterSelect) {
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = 'default';
+    defaultOption.textContent = 'Default';
+    characterSelect.appendChild(defaultOption);
+
+    // Add characters from the data file
+    characters.forEach(char => {
+      const option = document.createElement('option');
+      option.value = char.id;
+      option.textContent = char.title;
+      characterSelect.appendChild(option);
+    });
+
+    // Load saved character and set dropdown
+    chrome.storage.local.get(['web-buddy-selected-character-id'], (result) => {
+      const savedCharId = result['web-buddy-selected-character-id'] || 'default';
+      characterSelect.value = savedCharId;
+    });
+
+    // Save character on change
+    characterSelect.addEventListener('change', () => {
+      chrome.storage.local.set({ 'web-buddy-selected-character-id': characterSelect.value });
     });
   }
 }); 

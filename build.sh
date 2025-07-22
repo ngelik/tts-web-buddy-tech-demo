@@ -57,6 +57,7 @@ check_required_files() {
         "onboarding.js"
         "popup.html"
         "popup.js"
+        "src/characters.js"
     )
     
     local missing_files=()
@@ -188,6 +189,10 @@ create_build() {
     mkdir -p "$BUILD_DIR"
     print_success "Created build directory"
     
+    # Create src directory for module files
+    mkdir -p "$BUILD_DIR/src"
+    print_success "Created build/src directory"
+    
     # Copy all extension files
     local files_to_copy=(
         "manifest.json"
@@ -207,6 +212,12 @@ create_build() {
         cp "$file" "$BUILD_DIR/"
         print_success "Copied $file"
     done
+    
+    # Copy character definitions
+    if [[ -f "src/characters.js" ]]; then
+        cp "src/characters.js" "$BUILD_DIR/src/"
+        print_success "Copied src/characters.js"
+    fi
     
     # Copy icons directory
     if [[ -d "$ICONS_DIR" ]]; then

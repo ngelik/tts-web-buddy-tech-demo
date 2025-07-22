@@ -167,35 +167,43 @@ sequenceDiagram
 ### 2. Web Buddy Chat Flow
 
 The most complex workflow involving page analysis, voice interaction, and AI conversation.
+A user can select a character persona from the popup, which is saved to storage. When the chat is initiated, the service worker reads this preference to alter the AI's personality and voice.
 
 ```mermaid
 sequenceDiagram
     actor User
     participant POP as Popup
+    participant STO as chrome.storage
     participant SW as Service Worker
     participant CS as Content Script
     participant OFF as Offscreen Doc
     participant LLM as OpenRouter API
     participant TTS as ElevenLabs TTS API
 
+    User->>POP: Selects Character Persona
+    POP->>STO: Saves selected character ID
+
     User->>POP: Clicks "Web Buddy" button
     activate POP
     POP->>SW: sendMessage({type: 'START_ANALYSIS'})
     deactivate POP
     activate SW
+    SW->>STO: Reads selected character ID
+    STO-->>SW: Returns character ID
+    SW->>SW: Loads character persona data
     SW->>POP: Updates UI to "Reading Page..."
     SW->>CS: getPageMarkdownForAnalysis()
     activate CS
     CS->>CS: Scrapes page, converts to Markdown
     CS-->>SW: Returns Markdown context
     deactivate CS
-    SW->>SW: Stores page context
+    SW->>SW: Stores page context & character
     SW->>POP: Updates UI to "Recording..."
     SW->>OFF: sendMessage({type: 'start-recording'})
     activate OFF
     OFF->>OFF: Starts recording user's question
     deactivate OFF
-
+    
     User->>POP: Clicks "Stop Recording"
     activate POP
     POP->>SW: sendMessage({type: 'STOP_ANALYSIS_RECORDING'})
@@ -206,13 +214,13 @@ sequenceDiagram
     OFF-->>SW: Returns audio blob of question
     deactivate OFF
     SW->>SW: Transcribes audio via ElevenLabs STT
-    SW->>LLM: fetch(page context + question) [stream]
+    SW->>LLM: fetch(character prompt + page context + question) [stream]
     activate LLM
     loop Streaming Response
         LLM-->>SW: Receives text chunk
         SW->>SW: Buffers text into sentences
         opt When sentence is complete
-            SW->>TTS: fetch(sentence)
+            SW->>TTS: fetch(sentence, character voiceId)
             activate TTS
             TTS-->>SW: Returns audio blob for sentence
             deactivate TTS
@@ -315,13 +323,15 @@ tts-web-buddy-tech-demo/
 ├── offscreen.js          # Audio processing
 ├── options.js            # Settings management
 ├── onboarding.js         # Setup flow
-├── src/libs-bundle.js    # Bundled dependencies
+├── src/
+│   ├── characters.js       # Web Buddy persona definitions
+│   └── libs-bundle.js    # Bundled dependencies
 ├── webpack.config.js     # Build configuration
 └── icons/                # Extension icons
 ```
 
 ### Build Process
-The `webpack.config.js` bundles third-party libraries into `dist/libs-bundle.js` for efficient use within the content script.
+The `webpack.config.js` bundles third-party libraries into `dist/libs-bundle.js` for efficient use within the content script. The build.sh script assembles all necessary files into the build/ directory for testing.
 
 ### Key Design Patterns
 - **Message Passing**: All communication via `chrome.runtime.sendMessage`

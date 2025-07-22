@@ -1,3 +1,5 @@
+import { characters } from './src/characters.js';
+
 // Simplified state for the new workflow
 let recordingState = {
   isRecording: false,
@@ -13,6 +15,7 @@ let analysisState = {
   abortController: null,
   audioQueue: [],
   isPlayingAudio: false,
+  character: null,
 };
 
 // --- Offscreen Document Management ---
@@ -247,6 +250,9 @@ async function handleStartAnalysis(sendResponse) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return;
 
+  const { 'web-buddy-selected-character-id': selectedCharId } = await chrome.storage.local.get('web-buddy-selected-character-id');
+  const selectedCharacter = characters.find(c => c.id === selectedCharId);
+
   const abortController = new AbortController();
   analysisState = { 
     phase: 'fetching',
@@ -254,7 +260,8 @@ async function handleStartAnalysis(sendResponse) {
     tabId: tab.id,
     abortController: abortController,
     audioQueue: [],
-    isPlayingAudio: false
+    isPlayingAudio: false,
+    character: selectedCharacter || null
   };
 
   sendResponse(analysisState); // Update popup UI to "Fetching..."
@@ -312,6 +319,7 @@ function resetAnalysisState() {
     abortController: null,
     audioQueue: [],
     isPlayingAudio: false,
+    character: null,
   };
   closeOffscreenDocument();
 }
@@ -339,11 +347,13 @@ async function handleAnalysisAudio(dataUrl) {
     'ttsbuddy-api-key': elevenApi,
     'openrouter-api-key': orApi,
     'openrouter-model': orModel,
-    'elevenlabs-voice-id': voiceId,
+    'elevenlabs-voice-id': defaultVoiceId,
   } = await chrome.storage.local.get(['ttsbuddy-api-key','openrouter-api-key','openrouter-model','elevenlabs-voice-id']);
 
+  const voiceIdToUse = analysisState.character?.voiceId || defaultVoiceId;
+
   const tabId = analysisState.tabId;
-  if (!elevenApi || !orApi || !orModel || !voiceId) {
+  if (!elevenApi || !orApi || !orModel || !voiceIdToUse) {
     if (tabId) chrome.tabs.sendMessage(tabId, { type: 'error', message: 'API keys/model/voice missing, set them in options.'});
     chrome.runtime.openOptionsPage();
     resetAnalysisState();
@@ -355,7 +365,7 @@ async function handleAnalysisAudio(dataUrl) {
     const question = await transcribeUserAudio(dataUrl, elevenApi);
     if (!question) throw new Error('Empty transcription');
 
-    await streamLlmToTts(question, orApi, orModel, elevenApi, voiceId);
+    await streamLlmToTts(question, orApi, orModel, elevenApi, voiceIdToUse);
   } catch (e) {
     if (e.name !== 'AbortError') {
       console.error('Analysis error:', e);
@@ -419,7 +429,7 @@ async function playNextInQueue() {
 }
 
 async function streamLlmToTts(question, orApi, orModel, elevenApi, voiceId) {
-  const prompt = `You are an expert analyst. You will be given the content of a webpage in Markdown format. Your task is to analyze it and provide a concise, helpful answer to the user's question that follows the content.`;
+  const systemPrompt = analysisState.character?.prompt || `You are an expert analyst. You will be given the content of a webpage in Markdown format. Your task is to analyze it and provide a concise, helpful answer to the user's question that follows the content.`;
 
   const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -433,10 +443,8 @@ async function streamLlmToTts(question, orApi, orModel, elevenApi, voiceId) {
       model: orModel,
       stream: true,
       messages: [
-        { 
-          role: 'user', 
-          content: `${prompt}\n\nWebpage Content:\n\n---\n\n${analysisState.pageContext}\n\nMy question: ${question}` 
-        }
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Webpage Content:\n\n---\n\n${analysisState.pageContext}\n\nMy question: ${question}` }
       ]
     }),
     signal: analysisState.abortController.signal,
