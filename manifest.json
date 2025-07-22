@@ -14,7 +14,8 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "service-worker.js"
+    "service_worker": "service-worker.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -40,7 +41,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [ "icons/mic.png", "icons/mic-recording.png", "icons/mic-processing.png", "onboarding.html", "dist/libs-bundle.js" ],
+      "resources": [ "icons/mic.png", "icons/mic-recording.png", "icons/mic-processing.png", "onboarding.html", "dist/libs-bundle.js", "src/characters.js" ],
       "matches": [ "<all_urls>" ]
     }
   ]
