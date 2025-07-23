@@ -16,8 +16,6 @@ A voice-first AI Chrome extension that provides dictation, page copying, and con
 
 The Web Buddy extension follows a **hub-and-spoke architecture** with the Service Worker acting as the central coordinator. All components communicate through the Service Worker, which manages state, orchestrates actions, and handles external API calls.
 
-![Mermaid Chart - Architecture Overview.](./assets/mermaid-chart-2025-07-23-062340.svg)
-
 
 ```mermaid
 graph TD
@@ -112,8 +110,6 @@ First-time setup flow that:
 
 The dictation feature allows users to speak into any text field on a webpage.
 
-![Mermaid Chart - Voice Dictation Flow.](./assets/mermaid-chart-2025-07-23-062340.svg)
-
 ```mermaid
 sequenceDiagram
     actor User
@@ -175,8 +171,6 @@ sequenceDiagram
 
 The most complex workflow involving page analysis, voice interaction, and AI conversation.
 A user can select a character personality from the popup, which is saved to storage. When the chat is initiated, the service worker reads this preference to alter the AI's personality and voice.
-
-![Mermaid Chart - Web Buddy Chat Flow.](./assets/mermaid-chart-2025-07-23-062342.svg)
 
 ```mermaid
 sequenceDiagram
@@ -257,8 +251,6 @@ sequenceDiagram
 ### 3. Page Copy Flow
 
 Converts the current webpage to clean Markdown format.
-
-![Mermaid Chart - Page Copy Flow](./assets/mermaid-chart-2025-07-23-062343.svg)
 
 ```mermaid
 sequenceDiagram
