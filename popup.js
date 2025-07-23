@@ -11,27 +11,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = new URL(tabs[0].url);
       const hostname = url.hostname;
 
-      chrome.storage.local.get(['ttsbuddy-disabled-hosts'], (result) => {
-        const disabledHosts = result['ttsbuddy-disabled-hosts'] || [];
-        const isDisabled = disabledHosts.includes(hostname);
-        toggle.checked = !isDisabled;
+      chrome.storage.local.get(['ttsbuddy-enabled-hosts'], (result) => {
+        const enabledHosts = result['ttsbuddy-enabled-hosts'] || [];
+        const isEnabled = enabledHosts.includes(hostname);
+        toggle.checked = isEnabled; // Checked = enabled, unchecked = disabled
       });
 
       toggle.addEventListener('change', () => {
         
-        chrome.storage.local.get(['ttsbuddy-disabled-hosts'], (result) => {
-          const disabledHosts = result['ttsbuddy-disabled-hosts'] || [];
+        chrome.storage.local.get(['ttsbuddy-enabled-hosts'], (result) => {
+          const enabledHosts = result['ttsbuddy-enabled-hosts'] || [];
           
           if (toggle.checked) {
-            // Enable: remove from disabled list
-            const newDisabledHosts = disabledHosts.filter(h => h !== hostname);
-            chrome.storage.local.set({ 'ttsbuddy-disabled-hosts': newDisabledHosts });
-          } else {
-            // Disable: add to disabled list
-            if (!disabledHosts.includes(hostname)) {
-              disabledHosts.push(hostname);
-              chrome.storage.local.set({ 'ttsbuddy-disabled-hosts': disabledHosts });
+            // Enable: add to enabled list
+            if (!enabledHosts.includes(hostname)) {
+              enabledHosts.push(hostname);
+              chrome.storage.local.set({ 'ttsbuddy-enabled-hosts': enabledHosts });
             }
+          } else {
+            // Disable: remove from enabled list
+            const newEnabledHosts = enabledHosts.filter(h => h !== hostname);
+            chrome.storage.local.set({ 'ttsbuddy-enabled-hosts': newEnabledHosts });
           }
         });
       });

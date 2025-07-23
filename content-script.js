@@ -94,10 +94,10 @@ const PROCESSING_ICON_URL = chrome.runtime.getURL('icons/mic-processing.png');
 let siteEnabled = true;
 
 function updateSiteEnabledState() {
-  chrome.storage.local.get(['ttsbuddy-disabled-hosts'], (res) => {
-    const list = res['ttsbuddy-disabled-hosts'] || [];
+  chrome.storage.local.get(['ttsbuddy-enabled-hosts'], (res) => {
+    const list = res['ttsbuddy-enabled-hosts'] || [];
     const wasEnabled = siteEnabled;
-    siteEnabled = !list.includes(window.location.hostname);
+    siteEnabled = list.includes(window.location.hostname); // Only enabled if explicitly in list
     
     
     if (wasEnabled && !siteEnabled) {
@@ -117,7 +117,7 @@ function updateSiteEnabledState() {
 updateSiteEnabledState();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes['ttsbuddy-disabled-hosts']) {
+  if (area === 'local' && changes['ttsbuddy-enabled-hosts']) {
     updateSiteEnabledState();
   }
 });
