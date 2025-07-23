@@ -16,6 +16,9 @@ A voice-first AI Chrome extension that provides dictation, page copying, and con
 
 The Web Buddy extension follows a **hub-and-spoke architecture** with the Service Worker acting as the central coordinator. All components communicate through the Service Worker, which manages state, orchestrates actions, and handles external API calls.
 
+![Mermaid Chart - Architecture Overview.](./assets/mermaid-chart-2025-07-23-062340.svg)
+
+
 ```mermaid
 graph TD
     subgraph "Chrome Extension"
@@ -23,7 +26,7 @@ graph TD
         CS[Content Script<br/>DOM Interaction]
         POP[Popup UI<br/>User Controls]
         OPT[Options UI<br/>Settings]
-        OFF[Offscreen Document<br/>Audio Processing]
+        OD[Offscreen Document<br/>Audio Processing]
         ONB[Onboarding UI<br/>Setup Flow]
     end
 
@@ -40,7 +43,7 @@ graph TD
     %% Component Connections
     SW ---|chrome.runtime.sendMessage| CS
     SW ---|chrome.runtime.sendMessage| POP
-    SW ---|chrome.runtime.sendMessage| OFF
+    SW ---|chrome.runtime.sendMessage| OD
     SW ---|fetch| API_EL
     SW ---|fetch| API_OR
     SW ---|chrome.storage.local API| STO
@@ -55,7 +58,7 @@ graph TD
     OPT ---|Saves to| STO
     ONB ---|Saves to| STO
 
-    OFF -->|chrome.runtime.sendMessage| SW
+    OD -->|chrome.runtime.sendMessage| SW
 ```
 
 ## Key Components
@@ -109,12 +112,14 @@ First-time setup flow that:
 
 The dictation feature allows users to speak into any text field on a webpage.
 
+![Mermaid Chart - Voice Dictation Flow.](./assets/mermaid-chart-2025-07-23-062340.svg)
+
 ```mermaid
 sequenceDiagram
     actor User
     participant CS as Content Script
     participant SW as Service Worker
-    participant OFF as Offscreen Doc
+    participant OD as Offscreen Doc
     participant API as ElevenLabs STT API
 
     User->>CS: Clicks on text field
@@ -128,12 +133,12 @@ sequenceDiagram
     deactivate CS
     activate SW
     SW->>SW: setupOffscreenDocument()
-    SW->>OFF: sendMessage({type: 'start-recording'})
-    activate OFF
-    OFF->>User: Requests Mic Permission (if needed)
-    OFF->>OFF: Starts MediaRecorder
-    OFF->>SW: sendMessage({type: 'recording-started-offscreen'})
-    deactivate OFF
+    SW->>OD: sendMessage({type: 'start-recording'})
+    activate OD
+    OD->>User: Requests Mic Permission (if needed)
+    OD->>OD: Starts MediaRecorder
+    OD->>SW: sendMessage({type: 'recording-started-offscreen'})
+    deactivate OD
     SW->>CS: sendMessage({type: 'recording-started'})
     deactivate SW
     activate CS
@@ -149,11 +154,11 @@ sequenceDiagram
     activate CS
     CS->>User: Updates Mic Icon to 'Processing'
     deactivate CS
-    SW->>OFF: sendMessage({type: 'stop-recording'})
-    activate OFF
-    OFF->>OFF: Stops MediaRecorder, gets Blob
-    OFF->>SW: sendMessage({type: 'audio-blob-ready', dataUrl})
-    deactivate OFF
+    SW->>OD: sendMessage({type: 'stop-recording'})
+    activate OD
+    OD->>OD: Stops MediaRecorder, gets Blob
+    OD->>SW: sendMessage({type: 'audio-blob-ready', dataUrl})
+    deactivate OD
     SW->>API: fetch(audio data)
     activate API
     API-->>SW: Returns {text: "..."}
@@ -171,6 +176,8 @@ sequenceDiagram
 The most complex workflow involving page analysis, voice interaction, and AI conversation.
 A user can select a character personality from the popup, which is saved to storage. When the chat is initiated, the service worker reads this preference to alter the AI's personality and voice.
 
+![Mermaid Chart - Web Buddy Chat Flow.](./assets/mermaid-chart-2025-07-23-062342.svg)
+
 ```mermaid
 sequenceDiagram
     actor User
@@ -178,7 +185,7 @@ sequenceDiagram
     participant STO as chrome.storage
     participant SW as Service Worker
     participant CS as Content Script
-    participant OFF as Offscreen Doc
+    participant OD as Offscreen Doc
     participant LLM as OpenRouter API
     participant TTS as ElevenLabs TTS API
 
@@ -206,25 +213,25 @@ sequenceDiagram
     activate TTS
     TTS-->>SW: Returns greeting audio
     deactivate TTS
-    SW->>OFF: sendMessage({type: 'PLAY_AUDIO'})
-    activate OFF
-    OFF->>User: Plays greeting (1.5 seconds)
-    deactivate OFF
+    SW->>OD: sendMessage({type: 'PLAY_AUDIO'})
+    activate OD
+    OD->>User: Plays greeting (1.5 seconds)
+    deactivate OD
     SW->>POP: Updates UI to "Recording..."
-    SW->>OFF: sendMessage({type: 'start-recording'})
-    activate OFF
-    OFF->>OFF: Starts recording user's question
-    deactivate OFF
+    SW->>OD: sendMessage({type: 'start-recording'})
+    activate OD
+    OD->>OD: Starts recording user's question
+    deactivate OD
     
     User->>POP: Clicks "Stop Recording"
     activate POP
     POP->>SW: sendMessage({type: 'STOP_ANALYSIS_RECORDING'})
     deactivate POP
     SW->>POP: Updates UI to "Thinking..."
-    SW->>OFF: sendMessage({type: 'stop-recording'})
-    activate OFF
-    OFF-->>SW: Returns audio blob of question
-    deactivate OFF
+    SW->>OD: sendMessage({type: 'stop-recording'})
+    activate OD
+    OD-->>SW: Returns audio blob of question
+    deactivate OD
     SW->>SW: Transcribes audio via ElevenLabs STT
     SW->>LLM: fetch(character prompt + page context + question) [stream]
     activate LLM
@@ -236,10 +243,10 @@ sequenceDiagram
             activate TTS
             TTS-->>SW: Returns audio blob for sentence
             deactivate TTS
-            SW->>OFF: queueAudioForPlayback(audioBlob)
-            activate OFF
-            OFF->>User: Plays audio sentence
-            deactivate OFF
+            SW->>OD: queueAudioForPlayback(audioBlob)
+            activate OD
+            OD->>User: Plays audio sentence
+            deactivate OD
         end
     end
     deactivate LLM
@@ -250,6 +257,8 @@ sequenceDiagram
 ### 3. Page Copy Flow
 
 Converts the current webpage to clean Markdown format.
+
+![Mermaid Chart - Page Copy Flow](./assets/mermaid-chart-2025-07-23-062343.svg)
 
 ```mermaid
 sequenceDiagram
