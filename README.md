@@ -88,12 +88,12 @@ The main user interface that:
 - Provides primary controls (Copy Page, Web Buddy)
 - Shows current status and feedback
 - Manages per-site enable/disable toggle
+- Selects AI character personality
 - Links to options and onboarding
 
 ### Options UI (`options.js`)
 Settings management that:
-- Stores API keys and configuration
-- Manages user preferences
+- Stores API keys and model configuration
 - Provides persistent storage via `chrome.storage.local`
 
 ### Onboarding UI (`onboarding.js`)
@@ -208,7 +208,7 @@ sequenceDiagram
     deactivate TTS
     SW->>OFF: sendMessage({type: 'PLAY_AUDIO'})
     activate OFF
-    OFF->>User: Plays greeting (3 seconds)
+    OFF->>User: Plays greeting (1.5 seconds)
     deactivate OFF
     SW->>POP: Updates UI to "Recording..."
     SW->>OFF: sendMessage({type: 'start-recording'})

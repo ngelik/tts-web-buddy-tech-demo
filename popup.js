@@ -1,3 +1,5 @@
+import { characters } from './src/characters.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   // Site toggle logic
   const toggle = document.getElementById('siteToggle');
@@ -124,5 +126,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Character selection logic
+  function setupCharacterButtons() {
+    const characterContainer = document.querySelector('.character-selector');
+    if (!characterContainer) return;
+
+    // Filter out the 'default' character
+    const selectableCharacters = characters.filter(c => c.id !== 'default');
+
+    selectableCharacters.forEach(char => {
+      const btn = document.createElement('button');
+      btn.className = 'char-btn';
+      btn.dataset.charId = char.id;
+      btn.title = char.title; // for tooltip
+      
+      let icon = '';
+      switch(char.id) {
+          case 'mood-sensitive-reader': icon = '📖'; break;
+          case 'vocal-navigation-companion': icon = '🎤'; break;
+          case 'cognitive-load-reducer': icon = '💡'; break;
+          case 'multilingual-clarity-assistant': icon = '🌐'; break;
+          case 'social-cue-interpreter': icon = '🤔'; break;
+          case 'humorous-parody': icon = '😂'; break;
+      }
+      btn.innerHTML = icon;
+
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        chrome.storage.local.set({ 'web-buddy-selected-character-id': char.id });
+      });
+
+      characterContainer.appendChild(btn);
+    });
+
+    // Load saved character and set active button
+    chrome.storage.local.get(['web-buddy-selected-character-id'], (result) => {
+      const savedCharId = result['web-buddy-selected-character-id'];
+      const activeBtn = savedCharId ? document.querySelector(`.char-btn[data-char-id="${savedCharId}"]`) : null;
+      
+      if (activeBtn) {
+        activeBtn.classList.add('selected');
+      } else {
+        // if no saved id or button not found, select the first one and save it
+        const firstBtn = document.querySelector('.char-btn');
+        if (firstBtn) {
+          firstBtn.classList.add('selected');
+          chrome.storage.local.set({ 'web-buddy-selected-character-id': firstBtn.dataset.charId });
+        }
+      }
+    });
+  }
+
+  setupCharacterButtons();
 
 }); 

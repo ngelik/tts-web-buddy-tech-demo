@@ -131,84 +131,6 @@
     .error { 
       color: #dc3545; 
     }
-    .custom-select-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    .custom-select-trigger {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      height: auto;
-      text-align: left;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      background: white;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: border-color 0.2s ease;
-    }
-    .custom-select-trigger:hover {
-      border-color: #884CB8;
-    }
-    .custom-select-trigger span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding-right: 5px;
-    }
-    .custom-select-trigger .arrow {
-      flex-shrink: 0;
-      transition: transform 0.2s ease;
-    }
-    .custom-select-wrapper.open .custom-select-trigger .arrow {
-      transform: rotate(180deg);
-    }
-    .custom-options {
-      display: none;
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-      z-index: 10;
-      max-height: 180px;
-      overflow-y: auto;
-      padding: 4px 0;
-      border: 1px solid #e2e8f0;
-    }
-    .custom-select-wrapper.open .custom-options {
-      display: block;
-      animation: fadeIn 0.2s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .custom-option {
-      padding: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      color: #2d3748;
-      transition: background-color 0.15s ease;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .custom-option:hover {
-      background-color: #f1f5f9;
-    }
-    .custom-option.selected {
-      background-color: #e2e8f0;
-      font-weight: 500;
-    }
   </style>
 </head>
 <body>
@@ -233,18 +155,6 @@
     <div class="form-group">
       <label for="elevenlabsVoiceId">Default ElevenLabs Voice ID:</label>
       <input type="text" id="elevenlabsVoiceId" name="elevenlabsVoiceId" placeholder="e.g., QkNxCtnKGOHCAoQubo3r (fallback voice)">
-    </div>
-    <div class="form-group">
-      <label for="characterSelectWrapper">Web Buddy Personality:</label>
-      <div class="custom-select-wrapper" id="characterSelectWrapper">
-        <button type="button" class="custom-select-trigger" id="characterSelectTrigger">
-          <span id="characterSelectText">Default</span>
-          <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5H7z" fill="#555"/></svg>
-        </button>
-        <div class="custom-options" id="characterOptions">
-          <!-- Options will be populated by options.js -->
-        </div>
-      </div>
     </div>
     <button id="save">Save Settings</button>
     <p id="status"></p>

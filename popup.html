@@ -134,6 +134,35 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+    .character-selector {
+      flex-basis: auto;
+      flex-grow: 1;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .char-btn {
+      background: #f1f5f9;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .char-btn:hover {
+      transform: translateY(-1px);
+      background: #e2e8f0;
+    }
+    .char-btn.selected {
+      border-color: #667eea;
+      background: #e0e7ff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
@@ -163,6 +192,13 @@
       <span class="setting-label">Chat with page</span>
       <div class="setting-control">
         <button id="webBuddyBtn" class="primary-btn">Web Buddy</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">Personality</span>
+      <div class="setting-control character-selector">
+        <!-- Buttons will be populated by popup.js -->
       </div>
     </div>
 
