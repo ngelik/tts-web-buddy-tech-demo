@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Buddy</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      width: 280px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #333;
+      margin: 0;
+    }
+    .container {
+      background: #ffffff88;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 20px;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: #1a202c;
+    }
+    #status {
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: #4a5568;
+      min-height: 18px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 18px;
+    }
+    .setting-label {
+      font-size: 14px;
+      color: #2d3748;
+      font-weight: 500;
+    }
+    .setting-control {
+      flex-basis: 120px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .primary-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 8px 0; /* Adjusted padding */
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.15s ease;
+      width: 110px; /* Fixed width */
+      text-align: center;
+    }
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+    }
+    .primary-btn:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .primary-btn.is-recording {
+      background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); /* orange/coral */
+    }
+    .primary-btn.is-processing {
+        background: linear-gradient(135deg, #ffb75e 0%, #feca57 100%); /* yellow/orange */
+    }
+    .primary-btn.is-listening {
+        background: linear-gradient(135deg, #2ed573 0%, #1dd1a1 100%); /* green */
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider {
+      background-color: #667eea;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    .character-selector {
+      flex-basis: auto;
+      flex-grow: 1;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .char-btn {
+      background: #f1f5f9;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .char-btn:hover {
+      transform: translateY(-1px);
+      background: #e2e8f0;
+    }
+    .char-btn.selected {
+      border-color: #667eea;
+      background: #e0e7ff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="icons/icon48.png" alt="Web Buddy Logo" class="logo">
+    <h1>Web Buddy</h1>
+    <div id="status">Your web-aware audio assistant</div>
+
+    <div class="setting-row">
+      <span class="setting-label">Voice Input</span>
+      <div class="setting-control">
+        <label class="toggle-switch">
+          <input type="checkbox" id="siteToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">Copy Page in Markdown</span>
+      <div class="setting-control">
+        <button id="copyBtn" class="primary-btn">Copy Page</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">Chat with page</span>
+      <div class="setting-control">
+        <button id="webBuddyBtn" class="primary-btn">Web Buddy</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">Personality</span>
+      <div class="setting-control character-selector">
+        <!-- Buttons will be populated by popup.js -->
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">Your setup</span>
+      <div class="setting-control">
+        <a href="options.html" target="_blank" class="primary-btn">Options</a>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html> 
