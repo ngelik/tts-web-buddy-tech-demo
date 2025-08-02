@@ -10,7 +10,7 @@ A voice-first AI Chrome extension that provides dictation, page copying, and con
 - **Character Personalities**: Multiple AI personalities with different voices and communication styles
 - **Smart Greetings**: Random personalized greetings when starting Web Buddy to provide audio feedback
 - **Site Toggle**: Enable/disable the extension per website
-- **API Integration**: Uses ElevenLabs for speech-to-text/text-to-speech and OpenRouter for LLM
+- **API Integration**: Uses ElevenLabs for speech-to-text/text-to-speech and Google for LLM
 
 ## Architecture Overview
 
@@ -35,7 +35,7 @@ graph TB
     
     subgraph "AI Services"
         EL[ElevenLabs API]
-        OR[OpenRouter API]
+        OR[Google API]
         M1[eleven_flash_v2_5]
         M2[eleven_turbo_v2_5]
         M3[eleven_multilingual_v2]
@@ -80,7 +80,7 @@ sequenceDiagram
     participant WB as Web Buddy Function
     participant DB as Database
     participant EL as ElevenLabs API
-    participant OR as OpenRouter API
+    participant OR as Google API
     participant CHAR as Character Config
 
     UI->>WS: Connect WebSocket
@@ -100,7 +100,7 @@ sequenceDiagram
         EL-->>WB: Audio Stream
         WB->>WS: Stream Audio
         WS->>UI: Play Audio
-    else OpenRouter + TTS Processing
+    else Google + TTS Processing
         WB->>OR: Generate Text (AI Enhancement)
         Note over WB,OR: Model: google/gemma-2-9b-it (~500ms)
         OR-->>WB: Enhanced Text Response
@@ -124,7 +124,7 @@ flowchart TD
     DB --> PROVIDER{Get AI Provider}
     
     PROVIDER --> EL_MODELS{ElevenLabs?}
-    PROVIDER --> OR_MODELS{OpenRouter?}
+    PROVIDER --> OR_MODELS{Google?}
     
     EL_MODELS --> FLASH{eleven_flash_v2_5?}
     EL_MODELS --> TURBO{eleven_turbo_v2_5?}
@@ -168,7 +168,7 @@ graph TB
     
     subgraph "AI/TTS Services"
         EL[ElevenLabs API]
-        OR[OpenRouter API]
+        OR[Google API]
     end
     
     subgraph "Audio Output"
@@ -266,15 +266,12 @@ graph LR
 - **Use Case**: Legacy multilingual content
 - **Best For**: Backward compatibility for non-English
 
-## OpenRouter Integration
+## Googel Cloud intergation
 
-Web Buddy now supports integration with OpenRouter for AI-powered text processing before TTS conversion. This enables intelligent character responses, content enhancement, and dynamic text generation.
-
-### Supported OpenRouter Models
+### Supported Models
 
 ### 6. **Google Gemma 2 9B Instruct**
 - **Model ID**: `google/gemma-2-9b-it`
-- **Provider**: Google via OpenRouter
 - **Type**: Instruction-tuned language model
 - **Parameters**: 9 billion
 - **Latency**: ~500-800ms
@@ -284,7 +281,6 @@ Web Buddy now supports integration with OpenRouter for AI-powered text processin
 
 ### 7. **Google Gemma 2 27B Instruct**
 - **Model ID**: `google/gemma-2-27b-it`
-- **Provider**: Google via OpenRouter
 - **Type**: Instruction-tuned language model (large)
 - **Parameters**: 27 billion
 - **Latency**: ~800-1200ms
@@ -295,7 +291,7 @@ Web Buddy now supports integration with OpenRouter for AI-powered text processin
 ## Hybrid AI + TTS Architecture
 
 ### Integration Flow
-1. **Text Input** → OpenRouter AI Model (text enhancement/generation)
+1. **Text Input** → AI Model (text enhancement/generation)
 2. **AI Response** → ElevenLabs TTS Model (speech synthesis)
 3. **Audio Output** → Streamed to client
 
@@ -306,15 +302,15 @@ Web Buddy now supports integration with OpenRouter for AI-powered text processin
 -- Add AI provider and model configuration
 ALTER TABLE web_buddy_params 
 ADD COLUMN ai_provider TEXT DEFAULT 'elevenlabs',
-ADD COLUMN openrouter_model TEXT DEFAULT NULL,
+ADD COLUMN google_model TEXT DEFAULT NULL,
 ADD COLUMN ai_system_prompt TEXT DEFAULT NULL,
 ADD COLUMN ai_temperature DECIMAL(3,2) DEFAULT 0.7,
 ADD COLUMN ai_max_tokens INTEGER DEFAULT 150;
 
--- Update character to use OpenRouter + ElevenLabs hybrid
+-- Update character to use Google + ElevenLabs hybrid
 UPDATE web_buddy_params 
 SET ai_provider = 'hybrid',
-    openrouter_model = 'google/gemma-2-9b-it',
+    google_model = 'google/gemma-2-9b-it',
     elevenlabs_model = 'eleven_flash_v2_5',
     ai_system_prompt = 'You are a helpful AI assistant. Respond naturally and conversationally.',
     ai_temperature = 0.7,
@@ -328,7 +324,7 @@ WHERE id = 'ai-enhanced-character';
 sequenceDiagram
     participant User as User Input
     participant WB as Web Buddy
-    participant OR as OpenRouter
+    participant OR as Google
     participant EL as ElevenLabs
     participant Client as Audio Output
 
@@ -353,10 +349,10 @@ SET ai_provider = 'elevenlabs',
     elevenlabs_model = 'eleven_flash_v2_5' 
 WHERE id = 'simple-tts-character';
 
--- OpenRouter + ElevenLabs hybrid (AI + TTS)
+-- Google + ElevenLabs hybrid (AI + TTS)
 UPDATE web_buddy_params 
 SET ai_provider = 'hybrid',
-    openrouter_model = 'google/gemma-2-9b-it',
+    google_model = 'google/gemma-2-9b-it',
     elevenlabs_model = 'eleven_turbo_v2_5',
     ai_system_prompt = 'You are a knowledgeable assistant.',
     ai_temperature = 0.8,
@@ -364,7 +360,7 @@ SET ai_provider = 'hybrid',
 WHERE id = 'ai-enhanced-character';
 
 -- View current model configurations
-SELECT id, title, ai_provider, openrouter_model, elevenlabs_model 
+SELECT id, title, ai_provider, google_model, elevenlabs_model 
 FROM web_buddy_params 
 ORDER BY sort_order;
 ```
@@ -445,7 +441,7 @@ WHERE id = 'multilingual-clarity-assistant';
 -- AI-enhanced characters with intelligent responses
 UPDATE web_buddy_params 
 SET ai_provider = 'hybrid',
-    openrouter_model = 'google/gemma-2-9b-it',
+    google_model = 'google/gemma-2-9b-it',
     elevenlabs_model = 'eleven_flash_v2_5',
     ai_system_prompt = 'You are a mood-sensitive reader who adapts your tone based on content.',
     ai_temperature = 0.8,
@@ -455,7 +451,7 @@ WHERE id = 'mood-sensitive-reader';
 -- Advanced AI character for complex tasks
 UPDATE web_buddy_params 
 SET ai_provider = 'hybrid',
-    openrouter_model = 'google/gemma-2-27b-it',
+    google_model = 'google/gemma-2-27b-it',
     elevenlabs_model = 'eleven_turbo_v2_5',
     ai_system_prompt = 'You are an expert consultant providing detailed analysis and insights.',
     ai_temperature = 0.6,
@@ -481,9 +477,9 @@ const elevenLabsRequest: ElevenLabsRequest = {
 
 ### Hybrid AI + TTS Processing
 ```typescript
-// Step 1: Process with OpenRouter AI model
+// Step 1: Process with Google AI model
 const openRouterRequest = {
-  model: character.openrouter_model, // e.g., 'google/gemma-2-9b-it'
+  model: character.google_model, // e.g., 'google/gemma-2-9b-it'
   messages: [
     {
       role: 'system',
@@ -498,7 +494,7 @@ const openRouterRequest = {
   max_tokens: character.ai_max_tokens
 };
 
-const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+const aiResponse = await fetch('https://google.ai/api/v1/chat/completions', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
@@ -524,9 +520,9 @@ const elevenLabsRequest: ElevenLabsRequest = {
 
 ### Environment Configuration
 ```bash
-# OpenRouter Integration
-OPENROUTER_API_KEY=your_openrouter_api_key
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+# Google Integration
+OPENROUTER_API_KEY=your_google_api_key
+OPENROUTER_BASE_URL=https://google.ai/api/v1
 
 # ElevenLabs (existing)
 ELEVENLABS_API_KEY=your_elevenlabs_api_key
@@ -562,8 +558,8 @@ When ElevenLabs releases new models:
 |----------|-------|---------------------------|-------------------|
 | ElevenLabs | Flash v2.5 | $0.30/1K chars | High-volume streaming |
 | ElevenLabs | Turbo v2.5 | $0.30/1K chars | Premium quality |
-| OpenRouter | Gemma 2 9B | $0.10/1K tokens | Cost-effective AI |
-| OpenRouter | Gemma 2 27B | $0.20/1K tokens | Advanced reasoning |
+| Google | Gemma 2 9B | $0.10/1K tokens | Cost-effective AI |
+| Google | Gemma 2 27B | $0.20/1K tokens | Advanced reasoning |
 
 ## Current Status
 
@@ -574,7 +570,7 @@ When ElevenLabs releases new models:
   - TTS Only: ~100-300ms
   - AI + TTS: ~600-1000ms
 - **Quality**: High quality maintained across all supported models
-- **AI Integration**: Full OpenRouter support with Google Gemma models
+- **AI Integration**: Full Google support with Google Gemma models
 
 ## Roadmap
 
